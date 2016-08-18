@@ -1,23 +1,32 @@
 function sendEmails() {
-  // get the name of the sheet
-  function sheetName() {
-  return SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
-  }
   
-  var sheet = SpreadsheetApp.getActiveSheet();
-  var startRow = 21;  // First row of data to process
-  var numRows = 2;   // Number of rows to process
-  // Fetch the range of cells A2:B3
-  var dataRange = sheet.getRange(startRow, 1, numRows, 2)
-  // Fetch values for each row in the Range.
-  var data = dataRange.getValues();
-  for (i in data) {
-    var row = data[i];
-    var errorMessage = row[0];
-    var message = errorMessage; 
-    var subject = 'Supermetrics Has an error in' + row[1] + " " + SpreadsheetApp.getActiveSpreadsheet().getName();
-    if (errorMessage != "Date"){
-    MailApp.sendEmail("blohmeyer@hlkagency.com", subject, message);
+  // ADD CUSTOM DATA HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  var managerEmail = "test@eamil.com "; // ADD YOUR EMAIL HERE!!!!!!
+  var numberofSheets = 12; // ADD HOW MANY SHEETS YOU ARE TRACKING HERE!!!
+  // END ADD CUSTOM DATA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  
+  var HTMLoutput = HtmlService.createHtmlOutput('<br>'); // does not work
+  var nameNumber = (numberofSheets + 1);
+  var errorExpression = /^Error.*/;
+  // fetch and save Sheet name and Status messages
+  var sheet = SpreadsheetApp.getActiveSheet();  
+  var sheetNameRange = sheet.getRange(21, 4, nameNumber)  
+  var sheetData = sheetNameRange.getValues();  
+  var dataRange = sheet.getRange(21, 9, numberofSheets)  
+  var data = dataRange.getValues();  
+  // loop over data in Last Status here
+  for (i in data) {  
+    var row = data[i];  
+    var errorSheet = sheetData[i]  
+    var currentCell = row[0];  
+    var regTest = errorExpression.test(currentCell);
+    // email information below
+    var subject = "please update this sheet: " + errorSheet;  
+    var message = 'Supermetrics Has an error in sheet: ' + errorSheet + ". In the spreadsheet " + SpreadsheetApp.getActiveSpreadsheet().getName() + " ";
+    if (regTest){ 
+      MailApp.sendEmail(managerEmail, subject, message);
+      Logger.log(message); //saving output to log
     }
   }
 }
+
